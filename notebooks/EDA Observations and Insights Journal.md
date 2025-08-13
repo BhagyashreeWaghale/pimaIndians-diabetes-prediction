@@ -28,9 +28,11 @@ This document serves as a log of key observations, statistical findings, and dec
 
 * BMI: 11 instances of 0.
 
-**Observation:** These 0 values in Glucose, BloodPressure, SkinThickness, Insulin, and BMI are biologically impossible and indicate missing data.
+**Observation:** 
+   These 0 values in Glucose, BloodPressure, SkinThickness, Insulin, and BMI are biologically impossible and indicate missing data.
 
-**ML Approach Decision:** Direct row removal (listwise deletion) is not feasible due to the high count of zeros, especially in SkinThickness (~30% of data) and Insulin (~49% of data). This would significantly reduce data size and potentially introduce bias by altering the Outcome distribution. Therefore, imputation will be necessary.
+**ML Approach Decision:** 
+   Direct row removal (listwise deletion) is not feasible due to the high count of zeros, especially in SkinThickness (~30% of data) and Insulin (~49% of data). This would significantly reduce data size and potentially introduce bias by altering the Outcome distribution. Therefore, imputation will be necessary.
 
 ## 3. Target Variable Distribution
 **Notebook: 1_EDA_Statistical_Analysis.ipynb**
@@ -41,9 +43,11 @@ This document serves as a log of key observations, statistical findings, and dec
 
     * Diabetic (1): 268 cases (~34.9%)
 
-**Observation:** The Outcome variable exhibits class imbalance, with a significantly higher proportion of non-diabetic cases.
+**Observation:** 
+   The Outcome variable exhibits class imbalance, with a significantly higher proportion of non-diabetic cases.
 
-**ML Approach Decision:** This imbalance is critical. Relying solely on accuracy as an evaluation metric would be misleading, as a model could achieve ~65% accuracy by simply predicting the majority class. Therefore, model evaluation will prioritize Precision, Recall, F1-score, and ROC AUC. Techniques such as oversampling (e.g., SMOTE), undersampling, or class weighting will be considered during model training to address this imbalance and improve the model's ability to predict the minority (diabetic) class.
+**ML Approach Decision:** 
+   This imbalance is critical. Relying solely on accuracy as an evaluation metric would be misleading, as a model could achieve ~65% accuracy by simply predicting the majority class. Therefore, model evaluation will prioritize Precision, Recall, F1-score, and ROC AUC. Techniques such as oversampling (e.g., SMOTE), undersampling, or class weighting will be considered during model training to address this imbalance and improve the model's ability to predict the minority (diabetic) class.
 
 ## 4. Feature Distributions and Relationships (Visual & Quantitative)
 **Notebook: 1_EDA_Statistical_Analysis.ipynb**
@@ -64,7 +68,7 @@ This document serves as a log of key observations, statistical findings, and dec
 
 * SkinThickness and Insulin are moderately correlated with each other (0.44), which is biologically plausible.
 
-**Quantitative Skewness and Kurtosis (from results provided):**
+**Quantitative Skewness and Kurtosis (from results):**
 
 **Skewness:**
 
@@ -76,9 +80,11 @@ This document serves as a log of key observations, statistical findings, and dec
 
 * High kurtosis (heavy tails, more outliers): Insulin (7.21), DiabetesPedigreeFunction (5.59), BloodPressure (5.18), BMI (3.29).
 
-**Observation:** Quantitative metrics confirm visual observations of non-normal distributions and heavy tails.
+**Observation:** 
+   Quantitative metrics confirm visual observations of non-normal distributions and heavy tails.
 
-**ML Approach Decision:** Features with high absolute skewness (e.g., Insulin, DiabetesPedigreeFunction) will likely benefit from non-linear transformations (e.g., np.log1p for positive-only skewed data) to make their distributions more symmetrical. This can improve the performance of models sensitive to feature distribution (e.g., linear models). High kurtosis reinforces the need for robust handling of outliers.
+**ML Approach Decision:** 
+   Features with high absolute skewness (e.g., Insulin, DiabetesPedigreeFunction) will likely benefit from non-linear transformations (e.g., np.log1p for positive-only skewed data) to make their distributions more symmetrical. This can improve the performance of models sensitive to feature distribution (e.g., linear models). High kurtosis reinforces the need for robust handling of outliers.
 
 ## 5. Quantitative Outlier Analysis (IQR Method)
 **Notebook: 1_EDA_Statistical_Analysis.ipynb**
