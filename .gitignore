@@ -13,8 +13,6 @@ venv/
 
 # Data
 data/raw/*.csv # If the raw data is too large, you might ignore it and provide download instructions
-data/processed/*.csv
-*.pkl
 *.joblib
 *.h5
 
