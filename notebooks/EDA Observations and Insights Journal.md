@@ -134,6 +134,7 @@ Significant Differences (p < 0.05) for ALL features: Pregnancies (p=0.000), Gluc
 
 **ML Approach Decision:** The Mann-Whitney U test results solidify the decision to use all features for modeling, as they all show a statistically significant relationship with the target variable, even BloodPressure.
 
+
 ## 7. Comprehensive Preprocessing & Modeling Strategy
 Based on these detailed observations and statistical validations, the refined ML approach will be:
 
@@ -160,3 +161,57 @@ Replace 0s in Glucose, BloodPressure, BMI, SkinThickness, and Insulin with the m
 **Model Evaluation:** Focus on F1-score, Precision, Recall, and ROC AUC for comprehensive evaluation, especially for the minority class.
 
 **Model Interpretation:** Prioritize understanding feature importance and model decisions (e.g., using SHAP values), given the healthcare context.
+
+
+## 8. Iterative Preprocessing: The Impact of Imputation, Transformation, and Scaling
+
+Following the initial EDA, a multi-step preprocessing pipeline was implemented to address data quality issues and prepare the features for machine learning models. The effects of each step were quantitatively and visually analyzed.
+
+**Imputation (Median):**
+
+Replacing the biologically impossible zeros with the median significantly altered the distributions of several key features.
+
+| Feature | Original Skewness | Imputed Skewness | Skewness Change | 
+|---|---|---|---|
+| `Glucose` | 0.17 | 0.54 | +0.37 | 
+| `BloodPressure` | \-1.84 | 0.14 | +1.98 | 
+| `SkinThickness` | 0.11 | 0.84 | +0.73 | 
+| `Insulin` | 2.27 | 3.38 | +1.11 | 
+| `BMI` | \-0.43 | 0.60 | +1.03 | 
+
+* Insights: Imputation corrected the deceptive symmetry caused by the spike at zero, revealing the true right-skew of features like Insulin and SkinThickness. The large change in BloodPressure's skewness (from -1.84 to 0.14) shows the successful mitigation of its zero-value problem.
+  
+
+**Transformation (log1p):**
+
+The np.log1p transformation was applied to highly skewed features to normalize their distributions.
+
+| Feature | Imputed Skewness | Transformed Skewness | Skewness Change |
+| :--- | :--- | :--- | :--- |
+| `Pregnancies` | 0.90 | -0.24 | -1.14 |
+| `Glucose` | 0.54 | -0.06 | -0.60 |
+| `SkinThickness` | 0.84 | -0.86 | -1.70 |
+| `Insulin` | 3.38 | -0.18 | -3.56 |
+| `BMI` | 0.60 | -0.04 | -0.64 |
+
+* Insights: 
+    * The transformation was extremely effective, particularly for the most problematic feature, Insulin, reducing its skewness from 3.38 to a near-symmetrical -0.18. Similarly, SkinThickness saw a significant shift, demonstrating the power of transformations to prepare data for modeling. The changes in skewness are consistently moving towards a value of zero, indicating a more normal distribution.
+    * The change in kurtosis values reveals the true effectiveness of the log1p transformation in handling the data's heavy tails. The kurtosis of Insulin, for instance, was reduced from an extremely high 16.23 after imputation to a more manageable 3.31 after transformation. This demonstrates that preprocessing has successfully prepared even the most challenging features for robust modeling.
+
+
+**Scaling (RobustScaler) - Skewness**
+
+Even after log1p transformation, features with extremely high kurtosis (like Insulin and SkinThickness) still have influential outliers. This makes RobustScaler a very strong candidate for scaling, as it's designed to handle such distributions without being unduly influenced by outliers. As scaling does not change the shape of the distribution, the skewness values remain the same as the transformed data.
+
+| Feature | Transformed Skewness | Scaled Skewness | Skewness Change |
+| :--- | :--- | :--- | :--- |
+| `Pregnancies` | -0.24 | -0.24 | 0.00 |
+| `Glucose` | -0.06 | -0.06 | 0.00 |
+| `BloodPressure` | 0.14 | 0.14 | 0.00 |
+| `SkinThickness` | -0.86 | -0.86 | 0.00 |
+| `Insulin` | -0.18 | -0.18 | 0.00 |
+| `BMI` | -0.04 | -0.04 | 0.00 |
+| `DiabetesPedigreeFunction` | 1.12 | 1.12 | 0.00 |
+| `Age` | 0.61 | 0.61 | 0.00 |
+
+* Insights: This table confirms that scaling works as intended by standardizing the data's range without altering the shape of the distribution. The fact that the skewness values remain at or near zero after this step is a success, as a symmetrical distribution is ideal for many models

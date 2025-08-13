@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.impute import SimpleImputer
 
 def load_and_clean_data(file_path):
     """
@@ -46,15 +47,11 @@ def impute_missing_values(df):
     # Median for Glucose, BloodPressure, BMI (robust to remaining outliers)
     # Median for SkinThickness, Insulin (highly skewed, many zeros)
     imputation_cols = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']
-
-    for col in imputation_cols:
-        if df_imputed[col].isnull().any(): # Check if there are NaNs to impute
-            median_val = df_imputed[col].median()
-            df_imputed[col].fillna(median_val, inplace=True)
-            print(f"Imputed missing values in '{col}' with median: {median_val:.2f}")
-
-    print("\nMissing values after imputation:")
-    print(df_imputed.isnull().sum())
+    imputer = SimpleImputer(strategy='median')
+    df_imputed[imputation_cols] = imputer.fit_transform(df_imputed[imputation_cols])
+    
+    print("\nMissing values after median imputation:")
+    print(df_imputed.isnull().sum()) 
 
     return df_imputed
 
@@ -68,12 +65,12 @@ if __name__ == "__main__":
     cleaned_df = load_and_clean_data(raw_data_path)
 
     # Impute the missing values
-    final_df = impute_missing_values(cleaned_df)
+    imputed_df = impute_missing_values(cleaned_df)
 
     print("\nFirst 5 rows of the fully processed data:")
-    print(final_df.head())
+    print(imputed_df.head())
 
     # Optionally, save the processed data
-    processed_data_path = '../data/processed/diabetes_processed.csv'
-    final_df.to_csv(processed_data_path, index=False)
-    print(f"\nProcessed data saved to: {processed_data_path}")
+    imputed_data_path = '../data/processed/diabetes_imputed.csv'
+    imputed_df.to_csv(imputed_data_path, index=False)
+    print(f"Imputed data saved to: {imputed_data_path}")
